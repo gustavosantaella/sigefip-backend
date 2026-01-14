@@ -13,7 +13,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # 3. Buscar dependencias
 find_package(Drogon REQUIRED)
 find_package(PostgreSQL REQUIRED) 
-find_package(jwt-cpp CONFIG REQUIRED)
+
+
 
 # 4. Definir ejecutable
 add_executable (sigefip-back 
@@ -29,8 +30,7 @@ target_include_directories(sigefip-back PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # Nota: Si PostgreSQL::PostgreSQL falla, intenta usar ${PostgreSQL_LIBRARIES}
 target_link_libraries(sigefip-back PRIVATE 
     Drogon::Drogon 
-    PostgreSQL::PostgreSQL
-    jwt-cpp::jwt-cpp 
+    PostgreSQL::PostgreSQL    
     OpenSSL::SSL
     OpenSSL::Crypto
 )

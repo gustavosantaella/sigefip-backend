@@ -4,8 +4,7 @@
 #include "../../services/UserService.h"
 #include "../../entities/User.h"
 #include <drogon/utils/coroutine.h>
-#include <jwt-cpp/jwt.h>
-
+#include <jwt-cpp/jwt.h> // Encabezado principal
 
 class AuthController : public BaseController<AuthController> {
 
@@ -44,12 +43,7 @@ public:
 		}
 
 		if (user.has_value()) {
-			auto token = jwt::create()
-				.set_type("JWS")
-				.set_issuer("auth0")
-				.set_payload_claim("sample", jwt::claim(std::string("test")))
-				.sign(jwt::algorithm::hs256{ "secret" });
-				
+		
 			this->response(callback, "");
 		}
 		else {
