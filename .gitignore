@@ -1,0 +1,16 @@
+# Build & Config
+build
+out
+.vs
+
+# uploads
+uploads/tmp
+enc_*
+
+
+# Loggin
+cmake_*
+*_log.*
+*.log
+*log
+*log*
