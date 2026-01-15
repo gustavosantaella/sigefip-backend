@@ -1,10 +1,12 @@
+#define NOMINMAX
 #include "../../shared/BaseController.h"
 #include "../../shared/helpers/Sha256Helper.h"
 #include "../../config/constants/constants.h"
 #include "../../services/UserService.h"
 #include "../../entities/User.h"
 #include <drogon/utils/coroutine.h>
-#include <jwt-cpp/jwt.h> // Encabezado principal
+#include <jwt-cpp/jwt.h>
+#include "../../shared/helpers/EnvHelper.h"
 
 class AuthController : public BaseController<AuthController> {
 
@@ -12,7 +14,7 @@ class AuthController : public BaseController<AuthController> {
 
 public:
 	METHOD_LIST_BEGIN
-		ADD_METHOD_TO(AuthController::login, API_PREFIX "/auth/login", Post);
+		ADD_METHOD_TO(AuthController::login, API_PREFIX "/auth/login", Post, "AuthMiddleware");
 	ADD_METHOD_TO(AuthController::signUp, API_PREFIX "/auth/sign-up", Post);
 	METHOD_LIST_END;
 
@@ -36,7 +38,7 @@ public:
 			this->response(callback, "User Not Found", k404NotFound, true);
 			co_return;
 		}
-
+		
 		if (!Sha256Helper::verify(pwd, user->getPwd())) {
 			this->response(callback, "Incorrect password, please try again.", k400BadRequest, true);
 			co_return;
@@ -44,7 +46,18 @@ public:
 
 		if (user.has_value()) {
 		
-			this->response(callback, "");
+			User u = user.value();
+			using namespace std::chrono_literals;
+			auto s = 3600s * 3; 
+			auto token = jwt::create()
+				.set_issuer("auth0")
+				.set_type("JWT")
+				.set_payload_claim("user", jwt::claim(u.email))
+				.set_payload_claim("id", jwt::claim(std::to_string(u.id)))
+				.set_expires_in(s)
+				.sign(jwt::algorithm::hs256{ EnvHelper::getSecretJWT()});
+		
+			this->response(callback, token);
 		}
 		else {
 			auto resp = HttpResponse::newHttpJsonResponse({ {"error", "Unauthorized"} });
