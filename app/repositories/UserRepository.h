@@ -18,9 +18,8 @@ public:
 
 		try {
 			// Use co_await directly on the future returned by execSqlAsyncFuture
-			auto future = dbClient->execSqlAsyncFuture(sql, email);
-			// En lugar de co_await, obtenemos el resultado de forma que no bloquee
-			auto r = future.get();
+			auto r = co_await dbClient->execSqlCoro(sql, email);
+
 
 			if (r.empty()) {
 				std::cout << "User not found" << std::endl;
@@ -28,7 +27,7 @@ public:
 				co_return std::nullopt;
 
 			}
-			auto row = r[0];
+			const auto& row = r[0];
 			User user;
 			user.id = row["id"].as<int>();
 			user.name = row["name"].as<std::string>();
@@ -51,7 +50,7 @@ public:
 		auto sql = "INSERT INTO users (name, email, password ) VALUES ($1, $2, $3)";
 		auto dbClient = drogon::app().getDbClient();
 
-		dbClient->execSqlAsyncFuture(sql, u.name, u.email, u.getPwd());
+		co_await dbClient->execSqlCoro(sql, u.name, u.email, u.getPwd());
 		co_return;
 	}
 };
