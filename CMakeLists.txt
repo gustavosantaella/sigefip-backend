@@ -1,30 +1,29 @@
-﻿# 1. REQUERIMIENTO MÍNIMO (Debe ser la primera línea sin espacios arriba)
-cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.10)
 
-# 2. TOOLCHAIN de vcpkg (Configurado antes del proyecto)
-set(CMAKE_TOOLCHAIN_FILE "C:/laragon/www/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-
+# El proyecto debe ir ANTES de buscar paquetes
 project("sigefip-back")
 
-# 3. ESTÁNDAR C++20
+# 1. ESTÁNDAR C++20 (Crucial para co_await en Linux)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# 4. DEFINICIONES GLOBALES (Soluciona errores de picojson, openssl y getenv)
-add_definitions(-DNOMINMAX)                # Fix para errores de picojson (C2589 y C3878)
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)  # Fix para getenv
-add_definitions(-DOPENSSL_API_COMPAT=30000) # Fix para SHA256_Init y otros
+# 2. DEFINICIONES GLOBALES
+add_definitions(-DNOMINMAX)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+if(WIN32)
+    add_definitions(-DOPENSSL_API_COMPAT=30000)
+endif()
 
-# 5. BUSCAR DEPENDENCIAS
+
+# 3. BUSCAR DEPENDENCIAS
 find_package(Drogon REQUIRED)
 find_package(PostgreSQL REQUIRED)
 find_package(OpenSSL REQUIRED)
-# Nota: picojson no requiere find_package si es header-only desde vcpkg, 
-# pero si quieres usarlo como target:
-find_package(picojson CONFIG QUIET) 
-
-# 6. DEFINIR EJECUTABLE
+find_package(jwt-cpp REQUIRED) # Añadido para AuthController
+find_path(PICOJSON_INCLUDE_DIRS "picojson.h") # Buscamos el header
+# 4. DEFINIR EJECUTABLE
+# Asegúrate de que los nombres de carpetas coincidan exactamente (ej. 'app' vs 'App')
 add_executable(sigefip-back 
     "sigefip-back.cpp"
     "app/controllers/users/UserController.cpp"
@@ -34,24 +33,23 @@ add_executable(sigefip-back
     "app/services/UserService.h" 
     "app/shared/helpers/Sha256Helper.h" 
     "app/shared/helpers/EnvHelper.h"
-  "app/controllers/auth/AuthMiddleware.h")
+    "app/controllers/auth/AuthMiddleware.h"
+)
 
-# 7. DIRECTORIOS DE INCLUSIÓN
+# 5. DIRECTORIOS DE INCLUSIÓN
 target_include_directories(sigefip-back PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# 8. VINCULAR LIBRERÍAS
+# 6. VINCULAR LIBRERÍAS
 target_link_libraries(sigefip-back PRIVATE 
     Drogon::Drogon 
     PostgreSQL::PostgreSQL    
     OpenSSL::SSL
     OpenSSL::Crypto
+    jwt-cpp::jwt-cpp
 )
 
-# 9. CONFIGURACIÓN ESPECÍFICA PARA MSVC (Visual Studio)
+# 7. CONFIGURACIÓN ESPECÍFICA PARA MSVC
 if(MSVC)
-    # Habilitar Edit and Continue y corregir warnings
     target_compile_options(sigefip-back PRIVATE /ZI /W3)
-    
-    # Asegurar que el formato de depuración sea compatible
     string(REPLACE "/Zi" "/ZI" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 endif()

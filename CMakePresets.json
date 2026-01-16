@@ -6,15 +6,15 @@
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "installDir": "${sourceDir}/out/install/${presetName}",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "C:/laragon/www/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      }
+      "installDir": "${sourceDir}/out/install/${presetName}"
     },
     {
       "name": "windows-base",
       "hidden": true,
       "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "C:/laragon/www/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -22,35 +22,35 @@
       }
     },
     {
+      "name": "linux-base",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
       "name": "x64-debug",
-      "displayName": "x64 Debug (Visual Studio)",
-      "description": "Configuración estándar para MSVC en Visual Studio",
+      "displayName": "Windows (MSVC)",
       "inherits": "windows-base",
       "architecture": {
         "value": "x64",
         "strategy": "external"
       },
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
-      "name": "x64-release",
-      "displayName": "x64 Release (Visual Studio)",
-      "inherits": "x64-debug",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "x64-debug",
-      "configurePreset": "x64-debug"
-    },
-    {
-      "name": "x64-release",
-      "configurePreset": "x64-release"
+      "name": "wsl-debug",
+      "generator": "Unix Makefiles",
+      "displayName": "WSL (Ubuntu)",
+      "inherits": "linux-base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     }
   ]
 }
