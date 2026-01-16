@@ -10,9 +10,8 @@ class UserService {
 
 public:
 	Task<std::optional<User>> findByEmail(std::string email) {
-		User u;
 
-		auto r = co_await UserRepository::findByEmail(email);
+		const auto r = co_await UserRepository::findByEmail(email);
 	
 		co_return r;
 	}

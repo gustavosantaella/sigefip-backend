@@ -43,7 +43,7 @@ protected:
 	}
 
 protected :
-	Json::Value getDataFromBasicAuthorization(std::string basic){
+	Json::Value getDataFromBasicAuthorization(const std::string& basic){
 		auto token = basic.substr(6);
 
 		return Base64Helper::getJsonFromJson64(token);

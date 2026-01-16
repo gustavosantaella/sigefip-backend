@@ -18,7 +18,7 @@ public:
 
 		try {
 			// Use co_await directly on the future returned by execSqlAsyncFuture
-			auto r = co_await dbClient->execSqlCoro(sql, email);
+			const auto& r = co_await dbClient->execSqlCoro(sql, email);
 
 
 			if (r.empty()) {
@@ -51,6 +51,7 @@ public:
 		auto dbClient = drogon::app().getDbClient();
 
 		co_await dbClient->execSqlCoro(sql, u.name, u.email, u.getPwd());
+
 		co_return;
 	}
 };
