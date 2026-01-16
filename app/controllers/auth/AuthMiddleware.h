@@ -18,15 +18,24 @@ public:
         MiddlewareCallback&& mcb) override
     {
         const std::string& authHeader = req->getHeader("Authorization");
+        if(authHeader.empty()){
+            this->sendErrorResponse(mcb, "Missing Authorization Header", k401Unauthorized);
 
-        if (authHeader.empty() || authHeader.substr(0, 7) != "Bearer ") {
-            this->sendErrorResponse(mcb, "Authorization token is missing or malformed", k401Unauthorized);
             return;
         }
 
+        // 1. VALIDACIÓN SEGURA DE LONGITUD
+        // Evita el crash "invalid string position" si el header es corto o vacío
+        if (authHeader.size() < 7 || authHeader.compare(0, 7, "Bearer ") != 0) {
+            this->sendErrorResponse(mcb, "Missing Token or Token is malformed", k401Unauthorized);
+            return;
+        }
+
+        // 2. EXTRACCIÓN DEL TOKEN
         std::string token = authHeader.substr(7);
 
         try {
+            // 3. VERIFICACIÓN CON TRAITS POR DEFECTO (Para evitar errores de plantilla)
             auto verifier = jwt::verify()
                 .allow_algorithm(jwt::algorithm::hs256{ EnvHelper::getSecretJWT() })
                 .with_issuer("auth0");
@@ -34,16 +43,18 @@ public:
             auto decoded = jwt::decode(token);
             verifier.verify(decoded);
 
+            // 4. CONTINUAR FLUJO
             nextCb([mcb = std::move(mcb)](const HttpResponsePtr& resp) {
                 mcb(resp);
                 });
+
         }
-        // Solución a E0135: Usamos runtime_error que es la base de jwt-cpp
         catch (const std::runtime_error& e) {
+            // Captura errores de expiración o firma inválida de jwt-cpp
             this->sendErrorResponse(mcb, std::string("Invalid Token: ") + e.what(), k401Unauthorized);
         }
         catch (...) {
-            this->sendErrorResponse(mcb, "Undefined error", k401Unauthorized);
+            this->sendErrorResponse(mcb, "An Error ocurred", k401Unauthorized);
         }
     }
 
@@ -59,4 +70,5 @@ private:
         mcb(resp);
     }
 };
+
 

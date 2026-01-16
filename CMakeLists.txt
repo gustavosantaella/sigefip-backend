@@ -26,7 +26,7 @@ find_path(PICOJSON_INCLUDE_DIRS "picojson.h") # Buscamos el header
 # Asegúrate de que los nombres de carpetas coincidan exactamente (ej. 'app' vs 'App')
 add_executable(sigefip-back 
     "sigefip-back.cpp"
-    "app/controllers/users/UserController.cpp"
+    "app/controllers/users/UserController.h"
     "app/controllers/auth/AuthController.cpp"
     "app/repositories/UserRepository.h" 
     "app/entities/User.h" 

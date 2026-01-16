@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../shared/BaseController.h"
 
 #include "../../config/constants/constants.h"

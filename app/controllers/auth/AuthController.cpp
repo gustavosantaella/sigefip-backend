@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../shared/BaseController.h"
 #include "../../shared/helpers/Sha256Helper.h"
 #include "../../config/constants/constants.h"
@@ -26,6 +28,10 @@ public:
     )
     {
         auto basicHeader = this->getAuthorization(req);
+        if(basicHeader.substr(0,5) != "Basic"){
+            this->response(callback, "Invalid Header", k400BadRequest);
+            co_return;
+        }
         auto jsonData = this->getDataFromBasicAuthorization(basicHeader);
 
         std::string email = jsonData["email"].asString();
