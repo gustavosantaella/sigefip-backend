@@ -52,9 +52,6 @@ public:
 		using namespace std::chrono_literals;
 		auto s = 3600s * 3;
 
-		// --- CORRECCIÓN AQUÍ ---
-		// Especificamos el trait de picojson para que el compilador sepa qué motor usar
-		using traits = jwt::traits::kazuho_picojson;
 
 		const auto token = jwt::create()
 			.set_issuer("auth0")
