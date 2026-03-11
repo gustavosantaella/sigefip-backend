@@ -16,5 +16,14 @@ cmake_*
 *log*
 
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+venv/
+.venv/
+
 # envs 
 .env

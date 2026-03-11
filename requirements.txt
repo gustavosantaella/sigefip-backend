@@ -1,0 +1,5 @@
+pynest-api
+uvicorn[standard]
+supabase
+pydantic[email]
+python-dotenv
