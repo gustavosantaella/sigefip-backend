@@ -7,7 +7,7 @@ class AppController:
     @Get("/")
     def get_app_info(self):
         return {
-            "app_name": "SIGEFIP API",
+            "app_name": "Nexo Finance API",
             "version": "1.0.0",
             "status": "running",
         }

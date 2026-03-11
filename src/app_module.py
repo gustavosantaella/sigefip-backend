@@ -15,8 +15,8 @@ class AppModule:
 
 app = PyNestFactory.create(
     AppModule,
-    description="SIGEFIP Backend API",
-    title="SIGEFIP API",
+    description="Nexo Finance Backend API",
+    title="Nexo Finance API",
     version="1.0.0",
     debug=True,
 )

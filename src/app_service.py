@@ -5,7 +5,7 @@ from nest.core import Injectable
 class AppService:
 
     def __init__(self):
-        self.app_name = "SIGEFIP API"
+        self.app_name = "Nexo Finance API"
         self.app_version = "1.0.0"
 
     def get_app_info(self):

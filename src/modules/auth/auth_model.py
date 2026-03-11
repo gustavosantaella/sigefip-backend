@@ -12,3 +12,9 @@ class VerifyCodeModel(BaseModel):
 class UpdatePasswordModel(BaseModel):
     code: str
     new_password: str
+
+
+class DeleteAccountRequestModel(BaseModel):
+    email: str
+    password: str
+    reason: str = ""

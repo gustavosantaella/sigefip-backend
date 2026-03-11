@@ -64,3 +64,27 @@ class AuthService:
             }
         except Exception as e:
             return {"error": str(e)}
+
+    def process_delete_account(self, email: str, password: str, reason: str = ""):
+        """Authenticate the user, then delete their account."""
+        try:
+            # Verify credentials by signing in
+            auth_response = self.client.auth.sign_in_with_password({
+                "email": email,
+                "password": password,
+            })
+
+            if not auth_response.user:
+                return {"error": "Credenciales inválidas"}
+
+            user_id = auth_response.user.id
+
+            # Delete the user via admin API
+            self.client.auth.admin.delete_user(user_id)
+
+            return {
+                "message": "Cuenta eliminada exitosamente",
+                "reason": reason if reason else None,
+            }
+        except Exception as e:
+            return {"error": str(e)}
