@@ -9,9 +9,13 @@ class AdminService:
     def get_stats(self):
         """Get system statistics: total users and total admins."""
         try:
+            print("DEBUG Admin: Fetching users from auth.admin...")
             # Use Admin API to get actual users from Supabase Auth
-            auth_users = self.client.auth.admin.list_users()
-            total_users = len(auth_users)
+            auth_response = self.client.auth.admin.list_users()
+            
+            # auth_response is a list of User objects in latest supabase-py
+            total_users = len(auth_response)
+            print(f"DEBUG Admin: Found {total_users} users in Auth")
             
             # Count admins from settings
             admins = self.client.from_("settings") \
@@ -28,6 +32,9 @@ class AdminService:
             print(f"DEBUG Admin: Stats calculated -> {stats}")
             return stats
         except Exception as e:
+            print(f"DEBUG Admin Error: {str(e)}")
+            if hasattr(e, 'response'):
+                print(f"DEBUG Admin Error Response: {e.response}")
             raise Exception(f"Error getting stats: {str(e)}")
 
     def get_users(self):
