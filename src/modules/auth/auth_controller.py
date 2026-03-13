@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi import Request
 
 from .auth_service import AuthService
-from .auth_model import EmailModel, VerifyCodeModel, UpdatePasswordModel, DeleteAccountRequestModel
+from .auth_model import EmailModel, VerifyCodeModel, UpdatePasswordModel, LoginModel, DeleteAccountRequestModel
 
 
 @Controller("auth", tag="auth")
@@ -11,6 +11,10 @@ class AuthController:
 
     def __init__(self, auth_service: AuthService):
         self.auth_service = auth_service
+
+    @Post("/login")
+    def login(self, data: LoginModel):
+        return self.auth_service.login(data)
 
     @Delete("/delete-account/{user_id}")
     def delete_account(self, user_id: str):

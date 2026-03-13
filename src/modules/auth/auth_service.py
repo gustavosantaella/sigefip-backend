@@ -8,6 +8,42 @@ class AuthService:
     def __init__(self):
         self.client = supabase
 
+    def login(self, data):
+        """Authenticate user and check admin status."""
+        try:
+            auth_response = self.client.auth.sign_in_with_password({
+                "email": data.email,
+                "password": data.password
+            })
+            
+            if not auth_response.user:
+                return {"error": "Invalid credentials"}
+                
+            user_id = auth_response.user.id
+            
+            # Check for admin status in settings table
+            admin_check = self.client.from_("settings") \
+                .select("value") \
+                .eq("user_id", user_id) \
+                .eq("key", "is_admin") \
+                .execute()
+                
+            is_admin = False
+            if admin_check.data:
+                is_admin = admin_check.data[0]['value'].lower() == 'true'
+                
+            return {
+                "message": "Login successful",
+                "access_token": auth_response.session.access_token if auth_response.session else None,
+                "user": {
+                    "id": user_id,
+                    "email": auth_response.user.email,
+                    "is_admin": is_admin
+                }
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
     def delete_account(self, user_id: str):
         try:
             self.client.auth.admin.delete_user(user_id)

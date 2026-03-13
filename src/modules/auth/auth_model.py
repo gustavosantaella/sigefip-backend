@@ -14,6 +14,11 @@ class UpdatePasswordModel(BaseModel):
     new_password: str
 
 
+class LoginModel(BaseModel):
+    email: str
+    password: str
+
+
 class DeleteAccountRequestModel(BaseModel):
     email: str
     password: str
