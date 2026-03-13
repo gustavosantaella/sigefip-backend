@@ -21,10 +21,12 @@ class AdminService:
                 .execute()
             total_admins = admins.count if admins.count is not None else 0
             
-            return {
+            stats = {
                 "total_users": total_users,
                 "total_admins": total_admins
             }
+            print(f"DEBUG Admin: Stats calculated -> {stats}")
+            return stats
         except Exception as e:
             raise Exception(f"Error getting stats: {str(e)}")
 
